@@ -1,0 +1,21 @@
+const express = require("express");
+const morgan = require("morgan");
+
+const blogPostsRouter = require("./blockPostRouter");
+const app = express();
+
+app.use(morgan("common"));
+app.use(express.json());
+
+// you need to import `blogPostsRouter` router and route
+// requests to HTTP requests to `/blog-posts` to `blogPostsRouter`
+
+app.use("/blog-posts", blogPostsRouter);
+
+// app.use("/blog-posts", (req, res) =>{
+//     res.json(BlogPosts.get());
+// })
+
+app.listen(process.env.PORT || 3000, () => {
+  console.log(`Your app is listening on port ${process.env.PORT || 3000}`);
+});
