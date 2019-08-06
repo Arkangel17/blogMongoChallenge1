@@ -1,43 +1,34 @@
-const uuid = require('uuid');
-const mongoose = require('mongoose');
-const express = require('express');
-const jsonparser = require('body-parser').json();
-console.log(jsonparser);
 
-// const bodyparser = express('bo')
+
+const mongoose = require('mongoose');
 mongoose.promise = global.promise;
 
 
 const BlogSchema = mongoose.Schema({
-  // created: uuid.v4(),
-  title: String,
-  body: String,
-  comments: [ { body: String }],
   author: {
     firstName: String,
     lastName: String
   },
-  meta: {
-    votes: Number,
-    favs: Number
-  }
-})
+  title: {type: String, required: true},
+  content: {type: String},
+  created: {type: Date, default: Date.now}
+});
 
-// BlogSchema.virtual('authorName').get(function() {
-//   return `${this.author.firstName} ${this.author.lastName}`.trim();
-// });
+BlogSchema.virtual('authorName').get(function() {
+  return `${this.author.firstName} ${this.author.lastName}`.trim();
+});
 
-// BlogSchema.methods.serialize = function() {
-//   return {
-//     id: this._id,
-//     author: this.authorName,
-//     content: this.content,
-//     title: this.title,
-//     created: this.created
-//   };
-// };
+BlogSchema.methods.serialize = function() {
+  return {
+    id: this._id,
+    author: this.authorName,
+    content: this.content,
+    title: this.title,
+    created: this.created
+  };
+};
 
-let newBlog = mongoose.model("newBlog", BlogSchema);
+let newblogs = mongoose.model("newblogs", BlogSchema);
 
 
-module.exports = { newBlog };
+module.exports = { newblogs };

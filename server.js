@@ -3,33 +3,42 @@ const morgan = require("morgan");
 const mongoose = require("mongoose");
 mongoose.Promise = global.Promise;
 
+
 const {
-  newBlog
-} = require("./models");
+  newblogs
+} = require('./models');
+
+const {
+  DATABASE_URL,
+  PORT
+} = require('./config')
 
 
 const app = express();
 
-app.use(morgan("common"));
+app.use(morgan('common'));
 app.use(express.json());
 
 
 
-app.get("/posts", (req, res) => {
-  newBlog.find({})
-    .then(post => {
-      res.json(posts.map(posts => post.serialize()))
+app.get('/postall', (req, res) => {
+  newblogs
+    .find()
+    .then(posts => {
+      res.json(posts.map(post =>
+        post.serialize()
+      ));
     })
     .catch(err => {
-      console.log(err);
+      console.error(err);
       res.status(500).json({
-        error: 'something\'s up'
-      })
-    })
-})
+        error: 'something went terribly wrong'
+      });
+    });
+});
 
 app.get('/posts/:id', (req, res) => {
-  newBlog.findById(req.params.id)
+  newblogs.findById(req.params.id)
     .then(post =>
       res.json(post.serialize()))
     .catch(err => {
@@ -41,7 +50,7 @@ app.get('/posts/:id', (req, res) => {
 })
 
 app.post('/posts', (req, res) => {
-  const reqFields = ["title", "content", "author"];
+  const reqFields = ['title', 'content', 'author'];
   for (let i = 0; i < reqFields.length; i++) {
     const field = reqFields[i];
     if (!(field in req.body)) {
@@ -50,13 +59,12 @@ app.post('/posts', (req, res) => {
       return res.status(400).send(message);
     }
   }
-  newBlog.create(
-      req.body.title,
-      req.body.content,
-      req.body.author
-    )
-    .then(post => console.log("wtf",post))
-    .then(post => res.json(post.serialize()))
+  newblogs.create({
+      title: req.body.title,
+      content: req.body.content,
+      author: req.body.author
+    })
+    .then(newblogs => res.status(201).json(newblogs.serialize()))
     .catch(err => {
       console.log(err);
       res.status(500).json({
@@ -65,9 +73,75 @@ app.post('/posts', (req, res) => {
     })
 })
 
-
-console.log('process.env.PORT', process.env.PORT)
-
-app.listen(process.env.PORT || 8008, () => {
-  console.log(`Your app is listening on port ${process.env.PORT || 8008}`);
+app.delete('/posts/:id', (req, res) => {
+  newblogs
+    .findByIdAndDelete(req.params.id)
+    .then(() => {
+      res.status(204).json({
+        msg: 'went through'
+      })
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({
+        error: 'something went wrong'
+      })
+    })
 });
+
+
+app.use('*', function (req, res) {
+  res.status(404).json({
+    message: 'Not Found'
+  });
+});
+
+let server;
+
+function runServer(databaseUrl, port = PORT) {
+  let options;
+  return new Promise((resolve, reject) => {
+    options = {
+      useNewUrlParser: true
+    }
+    mongoose.connect(databaseUrl, options, err => {
+      if (err) {
+        console.log('connection has not been made');
+        return reject(err);
+      }
+
+      server = app.listen(port, () => {
+          console.log(`Your app is listening on port ${port}`);
+          resolve();
+        })
+        .on('error', err => {
+          mongoose.disconnect();
+          reject(err);
+        });
+    });
+  });
+}
+
+function closeServer() {
+  return mongoose.disconnect().then(() => {
+    return new Promise((resolve, reject) => {
+      console.log('Closing server');
+      server.close(err => {
+        if (err) {
+          return reject(err);
+        }
+        resolve();
+      });
+    });
+  });
+}
+
+if (require.main === module) {
+  runServer(DATABASE_URL).catch(err => console.error(err));
+};
+
+module.exports = {
+  runServer,
+  app,
+  closeServer
+}
