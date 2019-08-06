@@ -1,3 +1,5 @@
+'use strict'
+
 const express = require("express");
 const morgan = require("morgan");
 const mongoose = require("mongoose");
@@ -25,9 +27,9 @@ app.get('/postall', (req, res) => {
   newblogs
     .find()
     .then(posts => {
-      res.json(posts.map(post =>
+      res.json(posts.map(post=>
         post.serialize()
-      ));
+      ))
     })
     .catch(err => {
       console.error(err);
@@ -38,6 +40,8 @@ app.get('/postall', (req, res) => {
 });
 
 app.get('/posts/:id', (req, res) => {
+  console.log(req.params)
+  console.log(req.params.id)
   newblogs.findById(req.params.id)
     .then(post =>
       res.json(post.serialize()))

@@ -1,4 +1,4 @@
-
+'use strict'
 
 const mongoose = require('mongoose');
 mongoose.promise = global.promise;
@@ -19,13 +19,16 @@ BlogSchema.virtual('authorName').get(function() {
 });
 
 BlogSchema.methods.serialize = function() {
-  return {
+  let obj = {
     id: this._id,
     author: this.authorName,
     content: this.content,
     title: this.title,
     created: this.created
-  };
+  }
+  let res = JSON.stringify(obj)
+
+  return res;
 };
 
 let newblogs = mongoose.model("newblogs", BlogSchema);
