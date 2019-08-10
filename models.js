@@ -26,9 +26,11 @@ BlogSchema.methods.serialize = function() {
     title: this.title,
     created: this.created
   }
-  let res = JSON.stringify(obj)
 
-  return res;
+  let res = JSON.stringify(obj)
+  console.log('res', res)
+
+  return obj;
 };
 
 let newblogs = mongoose.model("newblogs", BlogSchema);
