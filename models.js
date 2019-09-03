@@ -20,7 +20,7 @@ const commentSchema = mongoose.Schema({
 const blogSchema = mongoose.Schema({
   title: {type: String, required: true},
   content: String,
-  author: { type: mongoose.Schema.Types.ObjectId, ref: 'userName' },
+  author: { type: mongoose.Schema.Types.ObjectId, ref: 'authors' },
   comments: [commentSchema]
 });
 

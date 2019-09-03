@@ -222,7 +222,7 @@ app.get('/posts/:id', (req, res) => {
         id: post._id,
         title: post.title,
         content: post.content,
-        author: post.userName,
+        author: post.fullName,
         comments: post.comments
       })
     }             
