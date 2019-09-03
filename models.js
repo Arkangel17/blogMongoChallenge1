@@ -25,7 +25,7 @@ const blogSchema = mongoose.Schema({
 });
 
 blogSchema.pre('find', function(next) {  
-  this.populate('authorss');
+  this.populate('authors');
   next();
 });
 
