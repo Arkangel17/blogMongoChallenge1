@@ -20,28 +20,31 @@ const commentSchema = mongoose.Schema({
 const blogSchema = mongoose.Schema({
   title: {type: String, required: true},
   content: String,
-  author: { type: mongoose.Schema.Types.ObjectId, ref: 'authors' },
+  author: { type: mongoose.Schema.Types.ObjectId, ref: 'userName' },
   comments: [commentSchema]
 });
 
-blogSchema.pre('find', function(next) {
-  this.populate('authors');
+blogSchema.pre('find', function(next) {  
+  this.populate('authorss');
   next();
 });
 
 blogSchema.pre('findById', function(next) {
-  this.populate('authors');
+  this.populate('authors').execPopulate();
   next();
 });
 
+
 blogSchema.virtual('fullName').get(function() {
-  return `${this.author.firstName}, ${this.author.lastName}`.trim();
+  let res = `${authors.firstName, authors.lastName}`.trim();
+  console.log('res', res);
+  return res;
 });
 
 blogSchema.methods.serialize = function() {
   let obj = {
     id: this._id,
-    author: this.fullName,
+    author: this.author,
     content: this.content,
     title: this.title,
     comments: this.comments

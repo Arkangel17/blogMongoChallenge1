@@ -176,9 +176,9 @@ app.delete('/author/:id', (req, res) => {
       authors
         .findByIdAndRemove(req.params.id)
         .then(() => {
-          console.log(`Deleted blog by author, ${req.params.userName}`)
-        })
-    })
+          console.log(`Deleted blog by author, ${req.params.userName}`);
+        });
+    });
   authors
     .findByIdAndDelete(req.params.id || req.params.userName)
     .then(() => {
@@ -190,24 +190,21 @@ app.delete('/author/:id', (req, res) => {
       console.log(err);
       res.status(500).json({
         error: 'something went wrong'
-      })
-    })
+      });
+    });
 });
 
 
 app.get('/postall', (req, res) => {
   blogposts
     .find()
-    .then(posts =>
-      res.json(posts.map(post => {
-        return {
-          id: post.id,
-          title: post.title,
-          content: post.content,
-          author: post.fullName
-        };
-      }))
-    )
+    .then(async posts => {
+      await res.json(posts.map( post => 
+        {
+          console.log(post);
+          return post;
+        }))
+      })
     .catch(err => {
       console.error(err);
       res.status(500).json({
@@ -219,14 +216,16 @@ app.get('/postall', (req, res) => {
 app.get('/posts/:id', (req, res) => {
 
   blogposts.findById(req.params.id)
-    .then(post =>
+    .then(post =>{
+      console.log('post', post), 
       res.json({
         id: post._id,
         title: post.title,
         content: post.content,
-        author: post.fullName,
+        author: post.userName,
         comments: post.comments
       })
+    }             
     )
     .catch(err => {
       console.error(err);
